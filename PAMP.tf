@@ -78,3 +78,33 @@ resource "aws_route_table" "Motiva_Team1_RT_Pub_SN" {
     Name = "Motiva_team1_RT_Pub_SN"
   }
 }
+#create private route table, attach to the vpc. allow access from every ip. attach to nat-gateway
+resource "aws_route_table" "Motiva_Team1_RT_Prv_SN" {
+  vpc_id = aws_vpc.Motiva_Team1_VPC.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.Motiva_Team1_NAT.id
+  }
+
+  tags = {
+    Name = "Motiva_team1_RT_Prv_SN"
+  }
+}
+#Associate subnets with route table
+resource "aws_route_table_association" "Motiva_Team1_Public_RT-1" {
+  subnet_id      = aws_subnet.Motiva_Team1_Public_SN_01.id
+  route_table_id = aws_route_table.Motiva_Team1_RT_Pub_SN.id
+}
+resource "aws_route_table_association" "Motiva_Team1_Public_RT-2" {
+  subnet_id      = aws_subnet.Motiva_Team1_Public_SN_02.id
+  route_table_id = aws_route_table.Motiva_Team1_RT_Pub_SN.id
+}
+resource "aws_route_table_association" "Motiva_Team1_Private_RT-1" {
+  subnet_id      = aws_subnet.Motiva_Team1_Private_SN_01.id
+  route_table_id = aws_route_table.Motiva_Team1_RT_Prv_SN.id
+}
+resource "aws_route_table_association" "Motiva_Team1_Private_RT-2" {
+  subnet_id      = aws_subnet.Motiva_Team1_Private_SN_02.id
+  route_table_id = aws_route_table.Motiva_Team1_RT_Prv_SN.id
+}
