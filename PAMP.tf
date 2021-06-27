@@ -44,3 +44,37 @@ resource "aws_subnet" "Motiva_Team1_Private_SN_02" {
     Name = "Motiva_Team1_Private_SN_0.2"
   }
 }
+# Create an Internet Gateway 
+resource "aws_internet_gateway" "Motiva_Team1_IGW" {
+  vpc_id = aws_vpc.Motiva_Team1_VPC.id
+
+  tags = {
+    Name = "Motiva_Team1_IGW"
+  }
+}
+#Create a NAT Gateway
+ resource "aws_nat_gateway" "Motiva_Team1_NAT" {
+  allocation_id = aws_eip.Motiva_Team1_EIP.id
+  subnet_id     = aws_subnet.Motiva_Team1_Public_SN_01.id
+
+  tags = {
+    Name = "Motiva_Team1_NAT"
+  }
+}
+#Create EIP for Nat Gateway
+resource "aws_eip" "Motiva_Team1_EIP" {
+  vpc       = true
+}
+#create Public route table, attach to the vpc. allow access from every ip. attach to internet gateway
+resource "aws_route_table" "Motiva_Team1_RT_Pub_SN" {
+  vpc_id = aws_vpc.Motiva_Team1_VPC.id
+
+  route {
+    cidr_block = "0.0.0.0/0"
+    gateway_id = aws_internet_gateway.Motiva_Team1_IGW.id
+  }
+
+  tags = {
+    Name = "Motiva_team1_RT_Pub_SN"
+  }
+}
