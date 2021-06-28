@@ -108,3 +108,61 @@ resource "aws_route_table_association" "Motiva_Team1_Private_RT-2" {
   subnet_id      = aws_subnet.Motiva_Team1_Private_SN_02.id
   route_table_id = aws_route_table.Motiva_Team1_RT_Prv_SN.id
 }
+#create 2 frontend security group
+resource "aws_security_group" "Motiva_Team1_FrontEnd_SG" {
+  name        = "Motiva_Team1_FrontEnd_SG"
+  description = "Allow inbound traffic"
+  vpc_id      = aws_vpc.Motiva_Team1_VPC.id
+  ingress {
+    description      = "SSH rule VPC"
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+  ingress {
+    description      = "HTTP rule VPC"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Motiva_Team1_FrontEnd_SG"
+  }
+}
+#create backend security group
+resource "aws_security_group" "Motiva_Team1_BackEnd_SG" {
+  name        = "Motiva_Team1_BackEnd_SG"
+  description = "Allow inbound traffic"
+  vpc_id      = aws_vpc.Motiva_Team1_VPC.id
+  ingress {
+    description      = "SSH rule VPC"
+    from_port        = 22
+    to_port          = 22
+    protocol         = "tcp"
+    cidr_blocks      = ["10.0.1.0/24"]
+  }
+  ingress {
+    description      = "MYSQL rule VPC"
+    from_port        = 3306
+    to_port          = 3306
+    protocol         = "tcp"
+    cidr_blocks      = ["10.0.1.0/24"]
+  }
+  egress {
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+  }
+  tags = {
+    Name = "Motiva_Team1_BackEnd_SG"
+  }
+}
