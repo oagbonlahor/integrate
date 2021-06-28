@@ -210,3 +210,62 @@ resource "aws_s3_bucket_policy" "motiva-team1-policy" {
 }
 POLICY
 }
+#Create Cloudfront Distribution
+resource "aws_cloudfront_distribution" "s3_distribution" {
+  origin {
+    domain_name = aws_s3_bucket.motiva-team1-media.bucket_regional_domain_name
+    origin_id   = aws_s3_bucket.motiva-team1-media.id
+
+    #s3_origin_config {
+    #  origin_access_identity = "origin-access-identity/cloudfront/ABCDEFG1234567"
+    #}
+  }
+
+  enabled             = true
+  is_ipv6_enabled     = true
+  comment             = "Some comment"
+  default_root_object = "index.html"
+
+  logging_config {
+    include_cookies = false
+    bucket          = "motiva-team1-media.s3.amazonaws.com"
+    prefix          = "myprefix"
+  }
+
+  #aliases = ["mysite.example.com", "yoursite.example.com"]
+
+  default_cache_behavior {
+    allowed_methods  = ["GET", "HEAD"]
+    cached_methods   = ["GET", "HEAD"]
+    target_origin_id = aws_s3_bucket.motiva-team1-media.id
+
+    forwarded_values {
+      query_string = false
+
+      cookies {
+        forward = "none"
+      }
+    }
+
+    viewer_protocol_policy = "allow-all"
+    min_ttl                = 0
+    default_ttl            = 3600
+    max_ttl                = 86400
+  }
+  price_class = "PriceClass_All"
+
+  restrictions {
+    geo_restriction {
+      restriction_type = "none"
+      #locations        = ["US", "CA", "GB", "DE"]
+    }
+  }
+
+  tags = {
+    Environment = "s3_distribution"
+  }
+
+  viewer_certificate {
+    cloudfront_default_certificate = true
+  }
+}
