@@ -166,3 +166,47 @@ resource "aws_security_group" "Motiva_Team1_BackEnd_SG" {
     Name = "Motiva_Team1_BackEnd_SG"
   }
 }
+# Create S3 Media Bucket
+resource "aws_s3_bucket" "motiva-team1-media" {
+  bucket = "motiva-team1-media"
+  acl    = "private"
+
+  tags = {
+    Name        = "motiva-team1-media"
+    Environment = "Dev"
+  }
+}
+#Create Backup Bucket
+resource "aws_s3_bucket" "motiva-team1-backup" {
+  bucket = "motiva-team1-backup"
+  acl    = "private"
+
+  tags = {
+    Name        = "motiva-team1-backup"
+    Environment = "Dev"
+  }
+}
+# Attach a bucket policy to media bucket
+resource "aws_s3_bucket_policy" "motiva-team1-policy" {
+  bucket = aws_s3_bucket.motiva-team1-media.id
+
+    policy = <<POLICY
+{
+  "Version": "2012-10-17",
+  "Id": "motiva-team1-policy",
+  "Statement": [
+    {
+      "Sid": "PublicReadGetObject",
+      "Effect": "Allow",
+    "Principal": "*",
+      "Action": [
+          "s3:GetObject"
+          ],
+      "Resource":[
+          "arn:aws:s3:::motiva-team1-media/*"
+      ]
+    }
+  ]
+}
+POLICY
+}
